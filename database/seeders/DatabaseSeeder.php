@@ -23,6 +23,37 @@ class DatabaseSeeder extends Seeder
             'kelas' => null, // Admin tidak punya kelas
         ]);
 
+        User::create([
+            'name' => 'Admin1',
+            'username' => 'admin1', // Diubah dari nisn menjadi username
+            'password' => Hash::make('rahasia123'),
+            'role' => 'admin_tu',
+            'kelas' => null, // Admin tidak punya kelas
+        ]);
+
+        User::create([
+            'name' => 'Admin2',
+            'username' => 'admin2', // Diubah dari nisn menjadi username
+            'password' => Hash::make('rahasia123'),
+            'role' => 'admin_tu',
+            'kelas' => null, // Admin tidak punya kelas
+        ]);
+        User::create([
+            'name' => 'Admin3',
+            'username' => 'admin3', // Diubah dari nisn menjadi username
+            'password' => Hash::make('rahasia123'),
+            'role' => 'admin_tu',
+            'kelas' => null, // Admin tidak punya kelas
+        ]);
+        User::create([
+            'name' => 'Admin4',
+            'username' => 'admin4', // Diubah dari nisn menjadi username
+            'password' => Hash::make('rahasia123'),
+            'role' => 'admin_tu',
+            'kelas' => null, // Admin tidak punya kelas
+        ]);
+
+
         // 2. Akun Guru Bimbingan Konseling
         User::create([
             'name' => 'Bapak/Ibu Guru BK',

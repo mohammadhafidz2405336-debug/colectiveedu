@@ -271,6 +271,23 @@ class AssessmentWizard extends Component
         );
     }
 
+    public function previousQuestion()
+    {
+        // Cek agar index tidak minus
+        if ($this->current_question_index > 0) {
+            
+            // 1. Mundurkan index pertanyaan
+            $this->current_question_index--;
+            
+            // 2. Hapus data jawaban terakhir yang tersimpan di array
+            // (Pastikan kamu menyesuaikan nama variabel $answers sesuai dengan 
+            // variabel yang kamu pakai untuk menampung jawaban sementara)
+            if (!empty($this->answers)) {
+                array_pop($this->answers);
+            }
+        }
+    }
+
     public function submit()
     {
         $this->validate([

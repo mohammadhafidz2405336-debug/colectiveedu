@@ -93,8 +93,19 @@
                     @endif
                 </div>
 
-                {{-- Tombol Batal --}}
-                <div class="pt-4 border-t border-slate-50 text-center">
+                {{-- Tombol Navigasi Bawah (Kembali & Batal) --}}
+                <div class="pt-6 mt-4 border-t border-slate-50 flex justify-between items-center">
+                    
+                    {{-- Tombol Sebelumnya (Hanya muncul jika bukan pertanyaan pertama) --}}
+                    @if($current_question_index > 0)
+                        <button wire:click="previousQuestion" class="flex items-center gap-2 text-sm text-slate-500 font-bold hover:text-indigo-600 transition-colors py-2 px-4 rounded-full hover:bg-indigo-50">
+                            <span>←</span> Sebelumnya
+                        </button>
+                    @else
+                        <div></div> {{-- Spacer kosong agar tombol batal tetap di kanan --}}
+                    @endif
+
+                    {{-- Tombol Batal --}}
                     <button wire:click="$set('is_testing', false)" class="text-xs text-slate-400 font-bold uppercase tracking-widest hover:text-rose-500 transition-colors py-2 px-4 rounded-full hover:bg-rose-50">
                         Batalkan Tes
                     </button>

@@ -1,9 +1,21 @@
 <x-app-layout>
     <!-- Inisialisasi data global untuk pencarian dan pagination 10 data per halaman -->
     <div x-data="{ 
-        search: '', 
-        page: 1, 
+        // 1. Ambil data dari sessionStorage jika ada, jika tidak gunakan nilai default
+        search: sessionStorage.getItem('univ_search') || '', 
+        page: parseInt(sessionStorage.getItem('univ_page')) || 1, 
         perPage: 10,
+        
+        // 2. Gunakan init() dan $watch untuk menyimpan perubahan ke sessionStorage secara otomatis
+        init() {
+            this.$watch('search', value => {
+                sessionStorage.setItem('univ_search', value);
+            });
+            this.$watch('page', value => {
+                sessionStorage.setItem('univ_page', value);
+            });
+        },
+
         universities: [
             @foreach($universities as $kampus)
             {
@@ -54,14 +66,17 @@
             </div>
 
             <!-- Keterangan Jika Hasil Cari Kosong -->
-            <div x-show="filteredList.length === 0" class="bg-white p-12 rounded-2xl shadow-sm border border-slate-200 text-center text-slate-500 font-medium mb-8">
+            <div x-show="filteredList.length === 0" class="bg-white p-12 rounded-2xl shadow-sm border border-slate-200 text-center text-slate-500 font-medium mb-8" style="display: none;">
                 Kampus atau jurusan yang kamu cari tidak ditemukan.
             </div>
 
             <!-- List Kampus -->
             @foreach($universities as $kampus)
+                <!-- 3. Simpan dan ambil state isOpen untuk masing-masing kampus -->
                 <div 
-                    x-data="{ isOpen: false }"
+                    x-data="{ isOpen: sessionStorage.getItem('univ_campus_{{ $kampus->id }}') === 'true' }"
+                    x-init="$watch('isOpen', value => sessionStorage.setItem('univ_campus_{{ $kampus->id }}', value))"
+                    
                     x-show="paginatedList.some(k => k.id === {{ $kampus->id }})"
                     x-effect="if(search.length > 0) { isOpen = true }"
                     class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden mb-8 transition-all duration-300"
@@ -94,12 +109,11 @@
                     </div>
 
                     <!-- Tabel Jurusan -->
-                    <div x-show="isOpen" x-transition.opacity.duration.200ms class="overflow-x-auto border-t border-slate-100">
+                    <div x-show="isOpen" x-transition.opacity.duration.200ms class="overflow-x-auto border-t border-slate-100" style="display: none;">
                         <table class="w-full text-sm text-left text-slate-600">
                             <thead class="text-xs text-slate-500 uppercase bg-slate-50/50">
                                 <tr>
                                     <th scope="col" class="px-6 py-4 font-bold border-b">Program Studi</th>
-                                    <!-- PERUBAHAN: Mengubah header menjadi Jenjang -->
                                     <th scope="col" class="px-6 py-4 font-bold border-b">Jenjang</th>
                                     <th scope="col" class="px-6 py-3 font-bold border-b text-center bg-emerald-50/50" colspan="3">Data SNBP (Rapor)</th>
                                     <th scope="col" class="px-6 py-3 font-bold border-b text-center bg-indigo-50/50" colspan="3">Data SNBT (Tes)</th>
@@ -107,11 +121,9 @@
                                 <tr>
                                     <th scope="col" class="px-6 py-2 border-b"></th>
                                     <th scope="col" class="px-6 py-2 border-b"></th>
-                                    <!-- Sub Header SNBP -->
                                     <th scope="col" class="px-4 py-2 font-semibold border-b text-center bg-emerald-50/30 text-xs">Daya Tampung</th>
                                     <th scope="col" class="px-4 py-2 font-semibold border-b text-center bg-emerald-50/30 text-xs">Peminat</th>
                                     <th scope="col" class="px-4 py-2 font-semibold border-b text-center bg-emerald-50/30 text-xs">Keketatan</th>
-                                    <!-- Sub Header SNBT -->
                                     <th scope="col" class="px-4 py-2 font-semibold border-b text-center bg-indigo-50/30 text-xs">Daya Tampung</th>
                                     <th scope="col" class="px-4 py-2 font-semibold border-b text-center bg-indigo-50/30 text-xs">Peminat</th>
                                     <th scope="col" class="px-4 py-2 font-semibold border-b text-center bg-indigo-50/30 text-xs">Keketatan</th>
@@ -119,7 +131,6 @@
                             </thead>
                             <tbody>
                                 @forelse($kampus->studyPrograms as $jurusan)
-                                    <!-- Filter baris jurusan berdasarkan keyword pencarian -->
                                     <tr 
                                         x-show="search === '' || {{ json_encode(strtolower($jurusan->name)) }}.includes(search.toLowerCase()) || {{ json_encode(strtolower($kampus->name)) }}.includes(search.toLowerCase()) || {{ json_encode(strtolower($kampus->short_name ?? '')) }}.includes(search.toLowerCase())"
                                         class="hover:bg-slate-50/80 border-b border-slate-100 transition-colors last:border-0"
@@ -131,7 +142,6 @@
                                             @endif
                                         </td>
                                         
-                                        <!-- PERUBAHAN: Menampilkan Jenjang dengan warna badge yang dinamis -->
                                         <td class="px-6 py-4">
                                             <span class="px-2.5 py-1 rounded-full text-xs font-semibold 
                                                 {{ $jurusan->jenjang === 'S1' ? 'bg-indigo-100 text-indigo-700' : (in_array($jurusan->jenjang, ['D4', 'Sarjana Terapan']) ? 'bg-teal-100 text-teal-700' : 'bg-amber-100 text-amber-700') }}">
@@ -139,12 +149,10 @@
                                             </span>
                                         </td>
                                         
-                                        <!-- Data SNBP -->
                                         <td class="px-4 py-4 text-center">{{ $jurusan->snbp_capacity }}</td>
                                         <td class="px-4 py-4 text-center">{{ $jurusan->snbp_applicants }}</td>
                                         <td class="px-4 py-4 text-center font-bold text-emerald-600">{{ $jurusan->snbp_tightness }}%</td>
 
-                                        <!-- Data SNBT -->
                                         <td class="px-4 py-4 text-center">{{ $jurusan->snbt_capacity }}</td>
                                         <td class="px-4 py-4 text-center">{{ $jurusan->snbt_applicants }}</td>
                                         <td class="px-4 py-4 text-center font-bold text-indigo-600">{{ $jurusan->snbt_tightness }}%</td>
@@ -163,7 +171,7 @@
             @endforeach
 
             <!-- Tombol Navigasi Halaman (Pagination) -->
-            <div x-show="totalPages > 1" class="mt-8 flex items-center justify-between border border-slate-200 bg-white px-6 py-4 rounded-2xl shadow-sm">
+            <div x-show="totalPages > 1" class="mt-8 flex items-center justify-between border border-slate-200 bg-white px-6 py-4 rounded-2xl shadow-sm" style="display: none;">
                 <!-- Tampilan Mobile -->
                 <div class="flex flex-1 justify-between sm:hidden">
                     <button @click="if(page > 1) { page--; window.scrollTo({top: 0, behavior: 'smooth'}); }" :disabled="page === 1" class="relative inline-flex items-center rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-40 transition-opacity">Sebelumnya</button>
