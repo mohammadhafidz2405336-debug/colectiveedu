@@ -44,16 +44,6 @@ class DatabaseSeeder extends Seeder
             'kelas' => null, // Admin tidak punya kelas
         ]);
 
-
-        // 2. Akun Guru Bimbingan Konseling
-        User::create([
-            'name' => 'Bapak/Ibu Guru BK',
-            'username' => 'gurubk', // Diubah dari nisn menjadi username
-            'password' => Hash::make('rahasia123'),
-            'role' => 'guru_bk',
-            'kelas' => null, // Guru BK tidak punya kelas
-        ]);
-
         // Memanggil seeder lainnya
         $this->call([
             QuestionSeeder::class,
