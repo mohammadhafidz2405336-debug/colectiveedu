@@ -5,8 +5,8 @@ namespace App\Providers;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Support\Facades\URL
 use Illuminate\Validation\Rules\Password;
 
 class AppServiceProvider extends ServiceProvider
@@ -19,19 +19,17 @@ class AppServiceProvider extends ServiceProvider
         //
     }
 
-    public function boot(): void
-    {
-        // Paksa HTTPS jika di production (Railway)
-        if (config('app.env') === 'production') {
-            URL::forceScheme('https');
-        }
-    }
-
     /**
      * Bootstrap any application services.
      */
     public function boot(): void
     {
+        // 1. Paksa HTTPS jika di production (Railway)
+        if (config('app.env') === 'production') {
+            URL::forceScheme('https');
+        }
+
+        // 2. Konfigurasi default lainnya
         $this->configureDefaults();
     }
 
